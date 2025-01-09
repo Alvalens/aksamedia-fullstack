@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/auth/Login';
 import Dashboard from './pages/Dashboard';
-import Index from './pages/employee/Index';
-import Create from './pages/employee/Create';
-import Edit from './pages/employee/Edit';
+import EmployeeIndex from './pages/employee/Index';
+import EmployeeCreate from './pages/employee/Create';
+import EmployeeEdit from './pages/employee/Edit';
+import DivisionIndex from './pages/division/Index';
 import PrivateRoute from './utils/PrivateRoute';
 import AuthProvider from './context/AuthContext';
 import React from 'react';
@@ -25,9 +26,13 @@ const InnerApp: React.FC = () => (
       }
     >
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/employees" element={<Index />} />
-      <Route path="/employees/create" element={<Create />} />
-      <Route path="/employees/:id/edit" element={<Edit />} />
+
+      <Route path="/divisions" element={<DivisionIndex />} />
+      
+      <Route path="/employees" element={<EmployeeIndex />} />
+      <Route path="/employees/create" element={<EmployeeCreate />} />
+      <Route path="/employees/:id/edit" element={<EmployeeEdit />} />
+
       <Route path="/profile" element={<Profile />} />
     </Route>
 

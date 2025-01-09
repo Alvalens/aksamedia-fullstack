@@ -1,6 +1,13 @@
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import Form from "./Form";
 
 const Login: React.FC = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  if (user) {
+    navigate("/dashboard");
+  }
   return (
     <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-2">
       <div className="hidden bg-gray-100 lg:block dark:bg-gray-800">
