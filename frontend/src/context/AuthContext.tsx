@@ -55,7 +55,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     };
 
 
-    const logout = async ():Promise<boolean> => {
+    const logout = async (): Promise<boolean> => {
         setLoading(true);
         try {
             const response = await axiosInstance.post('logout');
@@ -76,18 +76,14 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         }
     };
 
-    const updateUser = async (updatedUser: UserProfile):Promise<boolean> => {
-        try {
-            const response = await axiosInstance.put('user/update', updatedUser);
-            if (response.data.status === 'success') {
-                setUser(updatedUser);
-                localStorage.setItem('user', JSON.stringify(updatedUser));
-                return true;
-            } else {
-                return false;
-            }
-        } catch (error) {
-            throw error;
+    const updateUser = async (updatedUser: UserProfile): Promise<boolean> => {
+        const response = await axiosInstance.put('user/update', updatedUser);
+        if (response.data.status === 'success') {
+            setUser(updatedUser);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            return true;
+        } else {
+            return false;
         }
     };
 

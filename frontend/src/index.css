@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: dark light;
-}
-
 * {
   margin: 0;
   padding: 0;

@@ -136,7 +136,7 @@ class EmployeeController extends Controller
                 'division' => 'required|uuid',
                 'position' => 'required|string|max:255',
             ]);
-            
+
             if ($request->hasFile('image')) {
                 // Delete the old image from storage
                 Storage::delete('public/' . $employee->image);
