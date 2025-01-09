@@ -69,11 +69,62 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete(); 
+        $request->user()->tokens()->delete();
 
         return response()->json([
             'status' => 'success',
             'message' => 'Logout successful',
         ]);
+    }
+
+    public function updateUser(Request $request)
+    {
+        try {
+            $admin = $request->user();
+
+            if ($admin->id !== $request->id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized',
+                ], 401);
+            }
+            $validated = $request->validate([
+                'username' => 'required|string|unique:admins,username,' . $admin->id,
+                'name' => 'required|string',
+                'phone' => 'required|string',
+                'email' => 'required|email|unique:admins,email,' . $admin->id,
+            ]);
+
+            $admin->username = $validated['username'];
+            $admin->name = $validated['name'];
+            $admin->phone = $validated['phone'];
+            $admin->email = $validated['email'];
+            $admin->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'User updated successfully',
+                'data' => [
+                    'admin' => [
+                        'id' => $admin->id,
+                        'name' => $admin->name,
+                        'username' => $admin->username,
+                        'phone' => $admin->phone,
+                        'email' => $admin->email,
+                    ],
+                ],
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

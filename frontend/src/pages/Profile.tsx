@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const Profile: React.FC = () => {
-  const { user, logout, updateUser } = useAuth();
+  const {user, logout, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(user);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -21,11 +22,29 @@ const Profile: React.FC = () => {
     setEditedUser(user);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (editedUser) {
-      updateUser(editedUser);
-      setIsEditing(false);
-      console.log('Profile updated:', editedUser);
+      try {
+        const success = await updateUser(editedUser);
+        if (success) {
+          setIsEditing(false);
+          alert('User profile updated successfully');
+        } else {
+          setError('Failed to update user profile');
+        }
+
+      } catch (error: Error | any) {
+        if (error.response) {
+          console.log(error);
+          if (error.response.status === 422) {
+            setError('Validation failed. Please check your input fields.');
+          } else {
+            setError('Something went wrong. Please try again later.');
+          }
+        } else {
+          setError('Network error. Please try again later.');
+        }
+      }
     }
   };
 
@@ -40,6 +59,7 @@ const Profile: React.FC = () => {
     <div className='max-w-7xl mx-auto p-6 bg-white dark:bg-gray-600 dark:text-white shadow-sm rounded-md'>
       <div className="space-y-4">
         <h1 className="text-2xl font-bold mb-4">User Profile</h1>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         {isEditing ? (
           <form>
             <div className="mb-4">
@@ -112,6 +132,7 @@ const Profile: React.FC = () => {
               </button>
             </div>
           </form>
+          
         ) : (
           <div>
             <div className="mb-4">

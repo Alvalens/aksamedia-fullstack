@@ -13,6 +13,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/divisions', [DivisionController::class, 'index'])->name('divisions.index');
     Route::apiResource('employees', EmployeeController::class);
+    Route::put('/user/update', [LoginController::class, 'updateUser'])->name('user.update');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
 

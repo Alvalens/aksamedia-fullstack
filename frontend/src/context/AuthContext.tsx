@@ -12,8 +12,8 @@ interface AuthContextType {
     user: UserProfile | null;
     loading: boolean;
     login: (username: string, password: string) => Promise<boolean>;
-    logout: () => void;
-    updateUser: (updatedUser: UserProfile) => void;
+    logout: () => Promise<boolean>;
+    updateUser: (updatedUser: UserProfile) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,10 +44,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
                 setUser(user);
                 setLoading(false);
                 return true;
-            } else if (response.data.status === 'error') {
-                const errors = response.data.errors;
-                setLoading(false);
-                throw new Error(errors ? Object.values(errors).flat().join(' ') : 'Something went wrong');
             } else {
                 setLoading(false);
                 return false;
@@ -59,20 +55,44 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     };
 
 
-    const logout = async () => {
+    const logout = async ():Promise<boolean> => {
         setLoading(true);
-        const response = await axiosInstance.post('logout');
-        if (response.data.status === 'success') {
-            setUser(null);
-            localStorage.removeItem('user');
-            localStorage.removeItem('token');
+        try {
+            const response = await axiosInstance.post('logout');
+            if (response.data.status === 'success') {
+                setUser(null);
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+                setLoading(false);
+                return true;
+            } else {
+                setLoading(false);
+                return false;
+            }
+        } catch (error) {
+            setLoading(false);
+            console.error('Logout failed:', error);
+            throw error;
         }
-        setLoading(false);
     };
 
-    const updateUser = (updatedUser: UserProfile) => {
-        setUser(updatedUser);
-        localStorage.setItem('user', JSON.stringify(updatedUser));
+    const updateUser = async (updatedUser: UserProfile):Promise<boolean> => {
+        try {
+            setLoading(true);
+            const response = await axiosInstance.put('user/update', updatedUser);
+            if (response.data.status === 'success') {
+                setUser(updatedUser);
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                setLoading(false);
+                return true;
+            } else {
+                setLoading(false);
+                return false;
+            }
+        } catch (error) {
+            setLoading(false);
+            throw error;
+        }
     };
 
     return (
