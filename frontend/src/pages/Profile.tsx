@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const Profile: React.FC = () => {
-  const {user, logout, updateUser } = useAuth();
+  const { user, logout, updateUser } = useAuth();
+  const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(user);
   const [error, setError] = useState('');
@@ -23,8 +24,15 @@ const Profile: React.FC = () => {
   };
 
   const handleSave = async () => {
+    setError('');
+    setLoading(true);
     if (editedUser) {
       try {
+        if (!editedUser.name || !editedUser.username || !editedUser.email || !editedUser.phone) {
+          setError('All fields are required');
+          return;
+        }
+
         const success = await updateUser(editedUser);
         if (success) {
           setIsEditing(false);
@@ -32,18 +40,20 @@ const Profile: React.FC = () => {
         } else {
           setError('Failed to update user profile');
         }
-
+        setLoading(false);
       } catch (error: Error | any) {
         if (error.response) {
-          console.log(error);
           if (error.response.status === 422) {
-            setError('Validation failed. Please check your input fields.');
+            const err = error.response.data.errors;
+            const messages = Object.values(err).flat().join('. ');
+            setError(messages);
           } else {
             setError('Something went wrong. Please try again later.');
           }
         } else {
           setError('Network error. Please try again later.');
         }
+        setLoading(false);
       }
     }
   };
@@ -125,14 +135,14 @@ const Profile: React.FC = () => {
               </button>
               <button
                 type="button"
+                {...(loading ? { disabled: true } : {})}
                 onClick={handleSave}
                 className="bg-blue-500 text-white py-2 px-4 rounded"
               >
-                Save
+                {loading ? 'Saving...' : 'Save'}
               </button>
             </div>
           </form>
-          
         ) : (
           <div>
             <div className="mb-4">

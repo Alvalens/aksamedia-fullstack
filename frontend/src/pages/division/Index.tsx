@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Division } from '../../../types/Division';
 import axiosInstance from '../../utils/axios';
 
@@ -54,20 +54,6 @@ const Index: React.FC = () => {
     fetchDivisions();
   }, [searchTerm, currentPage]);
 
-  const deleteDivision = async (id: string) => {
-    if (confirm('Are you sure you want to delete this division?')) {
-      try {
-        const response = await axiosInstance.delete(`/divisions/${id}`);
-        if (response.data.status === 'success') {
-          setDivisions((prev) => prev.filter((item) => item.id !== id));
-        } else {
-          alert('Failed to delete division');
-        }
-      } catch (error) {
-        console.error('Error deleting division:', error);
-      }
-    }
-  };
 
   return (
     <div className="max-w-7xl mx-auto p-4 bg-white dark:bg-gray-600 shadow-sm rounded-md">
@@ -75,9 +61,7 @@ const Index: React.FC = () => {
         Division List ({total})
       </h1>
       <div className="flex justify-between items-center mb-4">
-        <Link to="create" className="bg-blue-500 text-white py-2 px-4 rounded">
-          Create
-        </Link>
+        <div></div>
         <input
           type="text"
           placeholder="Search..."
@@ -101,7 +85,6 @@ const Index: React.FC = () => {
                     <th className="px-4 py-2 text-left">#</th>
                     <th className="px-4 py-2 text-left">Name</th>
                     <th className="px-4 py-2 text-left">Created At</th>
-                    <th className="px-4 py-2 text-left">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -116,22 +99,7 @@ const Index: React.FC = () => {
                       <td className="whitespace-nowrap px-4 py-2">
                         {new Date(division.created_at).toLocaleDateString()}
                       </td>
-                      <td className="whitespace-nowrap px-4 py-2">
-                        <div className="flex gap-2">
-                          <Link
-                            to={`${division.id}/edit`}
-                            className="bg-yellow-500 text-white py-1 px-3 rounded"
-                          >
-                            Edit
-                          </Link>
-                          <button
-                            onClick={() => deleteDivision(division.id)}
-                            className="bg-red-500 text-white py-1 px-3 rounded"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
+                      
                     </tr>
                   ))}
                   {divisions.length === 0 && !loading && (

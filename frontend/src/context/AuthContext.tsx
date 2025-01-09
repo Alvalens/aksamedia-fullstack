@@ -78,19 +78,15 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
     const updateUser = async (updatedUser: UserProfile):Promise<boolean> => {
         try {
-            setLoading(true);
             const response = await axiosInstance.put('user/update', updatedUser);
             if (response.data.status === 'success') {
                 setUser(updatedUser);
                 localStorage.setItem('user', JSON.stringify(updatedUser));
-                setLoading(false);
                 return true;
             } else {
-                setLoading(false);
                 return false;
             }
         } catch (error) {
-            setLoading(false);
             throw error;
         }
     };

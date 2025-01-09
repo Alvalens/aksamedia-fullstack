@@ -10,8 +10,13 @@ const Form: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
     try {
+      e.preventDefault();
+      if (!username || !password) {
+        setError('All fields are required');
+        return;
+      }
+
       const success = await login(username, password);
       if (success) {
         navigate('/dashboard');
@@ -21,7 +26,9 @@ const Form: React.FC = () => {
     } catch (error: Error | any) {
       if (error.response) {
         if (error.response.status === 422) {
-          setError('Validation failed. Please check your input fields.');
+          const err = error.response.data.errors;
+          const messages = Object.values(err).flat().join('. ');
+          setError(messages);
         } else if (error.response.status === 401) {
           setError('Invalid username or password');
         } else if (error.response.status === 400) {

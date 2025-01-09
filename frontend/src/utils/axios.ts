@@ -26,7 +26,6 @@ axiosInstance.interceptors.response.use(
 			localStorage.removeItem("user");
 			localStorage.removeItem("token");
 
-			window.location.href = "/"; 
 		}
 
 		return Promise.reject(error);
