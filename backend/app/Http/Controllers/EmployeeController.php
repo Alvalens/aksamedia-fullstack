@@ -128,7 +128,7 @@ class EmployeeController extends Controller
     {
         try {
             $employee = Employee::findOrFail($id);
-
+            
             $validated = $request->validate([
                 'image' => 'nullable|image',
                 'name' => 'required|string|max:255',

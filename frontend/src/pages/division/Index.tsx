@@ -45,6 +45,7 @@ const Index: React.FC = () => {
           alert('Failed to fetch divisions');
         }
       } catch (error) {
+        alert('Failed to fetch divisions');
         console.error('Error fetching divisions:', error);
       } finally {
         setLoading(false);
