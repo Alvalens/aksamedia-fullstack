@@ -11,11 +11,27 @@ const Form: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await login(username, password);
-    if (success) {
-      navigate('/dashboard');
-    } else {
-      setError('Invalid username or password');
+    try {
+      const success = await login(username, password);
+      if (success) {
+        navigate('/dashboard');
+      } else {
+        setError('Invalid username or password');
+      }
+    } catch (error: Error | any) {
+      if (error.response) {
+        if (error.response.status === 422) {
+          setError('Validation failed. Please check your input fields.');
+        } else if (error.response.status === 401) {
+          setError('Invalid username or password');
+        } else if (error.response.status === 400) {
+          navigate('/dashboard');
+        } else {
+          setError('Something went wrong. Please try again later.');
+        }
+      } else {
+        setError('Network error. Please try again later.');
+      }
     }
   };
 

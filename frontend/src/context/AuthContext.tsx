@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
+import axiosInstance from '../utils/axios';
 interface UserProfile {
     id: string;
     name: string;
@@ -30,33 +30,44 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
     const login = async (username: string, password: string): Promise<boolean> => {
         setLoading(true);
-        const user = {
-            id: '1',
-            username: 'testuser',
-            password: 'password',
-            name: 'John Doe',
-            email: 'user@user.com',
-            phone: '123-456-7890',
-        };
 
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                if (username === user.username && password === user.password) {
-                    localStorage.setItem('user', JSON.stringify(user));
-                    setUser(user);
-                    setLoading(false);
-                    resolve(true);
-                } else {
-                    setLoading(false);
-                    resolve(false);
-                }
-            }, 1000); // Simulate an async operation
-        });
+        try {
+            const response = await axiosInstance.post('login', { username, password });
+
+            if (response.data.status === 'success') {
+                const user = response.data.data.admin;
+                const token = response.data.data.token;
+
+                localStorage.setItem('user', JSON.stringify(user));
+                localStorage.setItem('token', token);
+
+                setUser(user);
+                setLoading(false);
+                return true;
+            } else if (response.data.status === 'error') {
+                const errors = response.data.errors;
+                setLoading(false);
+                throw new Error(errors ? Object.values(errors).flat().join(' ') : 'Something went wrong');
+            } else {
+                setLoading(false);
+                return false;
+            }
+        } catch (error) {
+            setLoading(false);
+            throw error;
+        }
     };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem('user');
+
+    const logout = async () => {
+        setLoading(true);
+        const response = await axiosInstance.post('logout');
+        if (response.data.status === 'success') {
+            setUser(null);
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+        }
+        setLoading(false);
     };
 
     const updateUser = (updatedUser: UserProfile) => {
